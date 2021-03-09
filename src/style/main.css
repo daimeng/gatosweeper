@@ -13,8 +13,7 @@ body {
 }
 
 #game {
-  /* font-family: 'DotGothic16', sans-serif; */
-  font-family: 'Ubuntu Mono', monospace;
+  font-family: 'Lucida Console', 'Monaco', monospace;
   font-size: 14px;
   cursor: pointer;
 }

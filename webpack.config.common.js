@@ -12,9 +12,6 @@ const generateHTMLPlugins = () => glob.sync('./src/**/*.html').map(
 );
 
 module.exports = {
-  node: {
-    fs: 'empty',
-  },
   entry: ['./src/js/app.js', './src/style/main.css'],
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -30,6 +27,10 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'raw-loader',
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
       },
     ],
   },
