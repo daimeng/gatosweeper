@@ -1,0 +1,62 @@
+{
+  "name": "gatosweeper",
+  "version": "1.0.0",
+  "description": "pvejs",
+  "main": "http://localhost:9001/",
+  "scripts": {
+    "build": "webpack --config webpack.config.prod.js",
+    "lint:js": "./node_modules/.bin/eslint src/js/*.js",
+    "lint:styles": "stylelint \"src/**/*.scss\"",
+    "lint:html": "pa11y-ci ./src/**/*.html",
+    "nw": "nw .",
+    "start:dev": "webpack-dev-server --config webpack.config.dev.js",
+    "start": "webpack --config webpack.config.prod.js && http-server ./dist -o"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erickzhao/static-html-webpack-boilerplate.git"
+  },
+  "author": "kobold taskmaster",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.2",
+    "babel-preset-env": "^1.7.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^1.0.0",
+    "cssnano": "^4.1.0",
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "glob": "^7.1.3",
+    "html-webpack-plugin": "^3.0.0",
+    "mini-css-extract-plugin": "^0.4.2",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "pa11y-ci": "^2.1.1",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.23.0",
+    "stylelint": "^9.5.0",
+    "stylelint-config-standard": "^18.2.0",
+    "webpack": "^4.18.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.8",
+    "webpack-merge": "^4.1.4",
+    "yaml-loader": "^0.6.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "dependencies": {
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.5",
+    "immutable": "^4.0.0-rc.12",
+    "nw": "^0.51.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-markdown": "^5.0.2",
+    "react-router-dom": "^5.2.0"
+  }
+}
