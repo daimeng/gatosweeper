@@ -286,12 +286,12 @@ function BoardCell({ record, cell, chorded, x, y }) {
   if (opened === 1)
     inner = monster > 0
       ? <div className="inner">X</div>
-      : <div className={`inner cell-${cell}`}>{cell || ''}</div>
+      : <div className="inner">{cell || ''}</div>
   else if (opened === 2)
     inner = <div className="inner">F</div>
 
   return (
-    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${opened === 2 ? 'flagged' : ''} ${chorded.has(key) ? 'chorded' : ''}`} data-x={x} data-y={y}>
+    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${opened === 2 ? 'flagged' : ''} ${chorded.has(key) ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
       {inner}
     </td>
   )

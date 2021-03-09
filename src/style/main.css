@@ -1,6 +1,9 @@
 body {
   margin: 0;
   height: 100vh;
+  cursor: url('/static/cursor2_hi.png') 8 0, pointer;
+  /* image-rendering: crisp-edges; */
+  image-rendering: pixelated;
 }
 
 #app {
@@ -15,7 +18,6 @@ body {
 #game {
   font-family: 'Lucida Console', 'Monaco', monospace;
   font-size: 14px;
-  cursor: pointer;
 }
 
 .board-cell {
