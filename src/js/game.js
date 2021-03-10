@@ -1,5 +1,6 @@
 import React from 'react'
 import { Map, Record, Range } from 'immutable'
+import throttle from 'lodash.throttle'
 
 function makeKey(x, y) {
   return (x << 8) | y
@@ -122,6 +123,7 @@ const CHORDED = new Set()
 export function Game({ initData }) {
   const [state, setState] = React.useState(initData)
   const record = state.record
+  const paw = React.useRef(null)
 
   function handleClick(evt) {
     if (evt.target.classList.contains('board-cell')) {
@@ -218,6 +220,10 @@ export function Game({ initData }) {
   }
 
 
+  function pawFollow(evt) {
+    paw.current.style.transform = `translate(${evt.clientX}px, ${evt.clientY}px)`
+  }
+
   function handleMouseMove(evt) {
     evt.preventDefault()
 
@@ -260,8 +266,8 @@ export function Game({ initData }) {
   }
 
   return (
-    <div id="game-container">
-      <div id="paw-cursor" />
+    <div id="game-container" onMouseMove={throttle(pawFollow, 50)}>
+      <div id="paw-cursor" ref={paw} />
       <table id="game" className="skin-default"
         onClick={handleClick}
         onContextMenu={handleRightClick}
