@@ -39,6 +39,7 @@ const GameRecord = Record({
   opened: null,
   monsters: null,
   chord: null,
+  lose: null
 })
 
 function createLayer(width, height) {
@@ -53,6 +54,7 @@ export function createGame(width, height, mines) {
     counts: createLayer(width, height),
     opened: createLayer(width, height),
     monsters: new Map(),
+    lose: []
   })
 
   return record.withMutations(r => {
@@ -94,6 +96,12 @@ function openCascade(record, x, y) {
       visited.add(makeKey(...cell))
       r.setIn(['opened', ...cell], 1)
 
+      // if hit a mine, continue, but set loss flag
+      if (r.monsters.getIn(cell) === 1) {
+        r.lose.push(cell)
+        continue
+      }
+
       if (r.counts.getIn(cell) > 0)
         continue
 
@@ -120,6 +128,8 @@ export function Game({ initData }) {
       const data = evt.target.dataset
       const x = +data.x
       const y = +data.y
+      if (record.opened.getIn([y, x]) !== 0) return
+
       return setState({
         record:
           state.record.withMutations(r => {
@@ -147,6 +157,7 @@ export function Game({ initData }) {
               r.set('first', false);
             }
 
+            // if (r.monsters.getIn([y, x]))
             // open the square
             openCascade(r, x, y)
           })
@@ -249,20 +260,23 @@ export function Game({ initData }) {
   }
 
   return (
-    <table id="game" className="skin-default"
-      onClick={handleClick}
-      onContextMenu={handleRightClick}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-    >
-      <tbody>
-        {record.counts.map((row, i) =>
-          <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
-        )}
-      </tbody>
-    </table>
+    <div id="game-container">
+      <div id="paw-cursor" />
+      <table id="game" className="skin-default"
+        onClick={handleClick}
+        onContextMenu={handleRightClick}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+      >
+        <tbody>
+          {record.counts.map((row, i) =>
+            <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
+          )}
+        </tbody>
+      </table>
+    </div>
   )
 }
 

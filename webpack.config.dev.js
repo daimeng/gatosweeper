@@ -4,6 +4,7 @@ const common = require('./webpack.config.common.js');
 
 module.exports = merge(common, {
   mode: 'development',
+  target: 'web',
   devServer: {
     contentBase: 'src',
     watchContentBase: true,
