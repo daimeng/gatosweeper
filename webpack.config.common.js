@@ -12,7 +12,7 @@ const generateHTMLPlugins = () => glob.sync('./src/**/*.html').map(
 );
 
 module.exports = {
-  entry: ['./src/js/app.js', './src/style/main.css'],
+  entry: ['./src/js/app.js', './src/style/main.scss'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'app.bundle.js',
@@ -35,6 +35,10 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
+      },
+      {
+        test: /\.(scss|sass)$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
     ],
   },

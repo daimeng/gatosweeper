@@ -22,6 +22,7 @@ body {
 
 .board-cell {
   border: 2px solid #333;
+  color: #333;
   border-radius: 3px;
   width: 24px;
   height: 24px;
@@ -101,7 +102,6 @@ body {
 } */
 
 .board-cell.opened {
-  color: #333;
   background-color: #eeee;
 }
 

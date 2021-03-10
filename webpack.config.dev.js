@@ -24,10 +24,6 @@ module.exports = merge(common, {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
         test: /\.ya?ml$/,
         type: 'json',
         oneOf: [

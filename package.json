@@ -37,6 +37,8 @@
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "pa11y-ci": "^2.1.1",
     "raw-loader": "^0.5.1",
+    "sass": "^1.32.8",
+    "sass-loader": "^11.0.1",
     "style-loader": "^0.23.0",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
