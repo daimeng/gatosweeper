@@ -1,3 +1,8 @@
+body::after{
+  position:absolute; width:0; height:0; overflow:hidden; z-index:-1; // hide images
+  content:url('/static/gato.png') url('/static/paw.png') url('/static/cursor2_hi.png') url('/static/monster.png');   // load images
+}
+
 body {
   margin: 0;
   height: 100vh;
@@ -14,8 +19,9 @@ body {
 
 #game {
   font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
 }
-
 
 #paw-cursor {
   position: absolute;
@@ -24,7 +30,7 @@ body {
   height: 52px;
   top: 14px;
   left: 0px;
-  transition: transform 0.1s ease-out;
+  transition: transform 0.2s ease-out;
 }
 
 #game-container {
@@ -82,7 +88,7 @@ body {
   width: 24px;
   height: 24px;
   padding: 0px;
-  margin: 0px;
+  margin: 1px;
   overflow: hidden;
   box-sizing: content-box;
   text-align: center;
@@ -141,6 +147,7 @@ body {
   border-right: 1px solid #303843; */
   background-color: #b8b9bb;
   font-weight: bold;
+  display: inline-flex;
 }
 
 .board-cell:hover {

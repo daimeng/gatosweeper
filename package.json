@@ -55,6 +55,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
+    "d3": "^6.6.0",
     "immutable": "^4.0.0-rc.12",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
