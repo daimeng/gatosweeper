@@ -179,8 +179,9 @@ export function Game({ initData }) {
 
       return setState({
         record: record.withMutations(r => {
-          r.update('monstersLeft', v => v - 1)
-          r.updateIn(['opened', y, x], v => v == 2 ? 0 : v == 0 ? 2 : v)
+          const status = r.opened.getIn([y, x])
+          r.update('monstersLeft', v => v + (status == 2 ? 1 : status == 0 ? -1 : 0))
+          r.setIn(['opened', y, x], status == 2 ? 0 : status == 0 ? 2 : status)
         })
       })
     }
@@ -270,11 +271,30 @@ export function Game({ initData }) {
     }
   }
 
+  const [time, setTime] = React.useState({ time: 0, lastTimed: performance.now() })
+
+  // start timer
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      const now = performance.now()
+      setTime({
+        time: time.time + now - time.lastTimed,
+        lastTimed: now
+      })
+    }, 500)
+
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <div id="game-container" onMouseMove={throttle(pawFollow, 50)}>
       <div id="paw-cursor" ref={paw} />
       <div>
-        <div>{record.monstersLeft}</div>
+        <div id="hud">
+          <div id="monsters-left">{record.monstersLeft}</div>
+          <div id="gato"></div>
+          <div id="timer">{`${Math.min(999, Math.floor(time.time / 1000))}`.padStart(3, '0')}</div>
+        </div>
         <table id="game" className="skin-default"
           onClick={handleClick}
           onContextMenu={handleRightClick}

@@ -13,7 +13,6 @@ body {
 }
 
 #game {
-  font-family: 'Lucida Console', 'Monaco', monospace;
   font-size: 14px;
 }
 
@@ -36,6 +35,43 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  font-family: 'Lucida Console', 'Monaco', monospace;
+}
+
+#hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#monsters-left {
+  width: 48px;
+  padding: 4px;
+  text-align: center;
+  box-sizing: border-box;
+  color: pink;
+  background-color: #444;
+  border: 2px solid white;
+}
+
+#gato {
+  width: 48px;
+  height: 48px;
+  background: url('/static/gato.png');
+}
+
+#timer {
+  width: 48px;
+  padding: 4px;
+  text-align: center;
+  box-sizing: border-box;
+  color: pink;
+  background-color: #444;
+  border: 2px solid white;
 }
 
 
@@ -108,9 +144,9 @@ body {
 }
 
 .board-cell:hover {
-  border: 2px solid gold !important;
+  border: 2px solid yellow !important;
   .inner {
-    border: 1px solid gold;
+    border: 1px solid yellow;
     border-radius: 4px;
   }
 }
@@ -118,7 +154,7 @@ body {
 .board-cell.opened:hover {
   // background-color: #bbb;
   .inner {
-    border: 1px solid gold;
+    border: 1px solid yellow;
   }
 }
 
