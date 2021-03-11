@@ -181,7 +181,17 @@ body {
 }
 
 .board-cell.flagged {
-  color: darkred;
+  background-image: url('/static/paw.png');
+}
+
+.board-cell.monster {
+  // color: darkred;
+  border: 2px solid orangered;
+  background: url('/static/monster.png');
+
+  .inner {
+    border: none;
+  }
 }
 
 .board-cell.chorded:not(.opened,.flagged) {

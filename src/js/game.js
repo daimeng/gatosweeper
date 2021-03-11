@@ -328,23 +328,21 @@ function BoardRow({ row, record, chorded, y }) {
 
 function BoardCell({ record, cell, chorded, x, y }) {
   const key = makeKey(x, y)
-  const monster = record.monsters.get(key);
+  const monster = record.monsters.get(key) || 0;
   const opened = record.opened.getIn([y, x]);
+  let showFlag = false
+  let showMonster = false
 
   let inner = <div className="inner"></div>
-  if (record.lose && monster > 0)
-    inner = <div className="inner">X</div>
-  else if (opened === 1)
-    inner = (
-      monster > 0
-        ? <div className="inner">X</div>
-        : <div className="inner">{cell || ''}</div>
-    )
+  if (opened === 1 && monster < 1)
+    inner = <div className="inner">{cell || ''}</div>
+  else if (record.lose && monster > 0)
+    showMonster = true
   else if (opened === 2)
-    inner = <div className="inner">F</div>
+    showFlag = true
 
   return (
-    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${opened === 2 ? 'flagged' : ''} ${chorded.has(key) ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
+    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${showMonster ? 'monster' : ''} ${showFlag ? 'flagged' : ''} ${chorded.has(key) ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
       {inner}
     </td>
   )
