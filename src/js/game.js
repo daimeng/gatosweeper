@@ -40,7 +40,7 @@ const GameRecord = Record({
   opened: null,
   monsters: null,
   chord: null,
-  lose: null,
+  lose: false,
   monstersLeft: 0,
 })
 
@@ -56,7 +56,6 @@ export function createGame(width, height, mines) {
     counts: createLayer(width, height),
     opened: createLayer(width, height),
     monsters: new Map(),
-    lose: []
   })
 
   return record.withMutations(r => {
@@ -95,13 +94,14 @@ function openCascade(record, x, y) {
     let stack = [[y, x]]
     let visited = new Set()
     while (stack.length) {
-      let cell = stack.pop()
-      visited.add(makeKey(...cell))
+      const cell = stack.pop()
+      const key = makeKey(cell[1], cell[0])
+      visited.add(key)
       r.setIn(['opened', ...cell], 1)
 
       // if hit a mine, continue, but set loss flag
-      if (r.monsters.getIn(cell) === 1) {
-        r.lose.push(cell)
+      if (r.monsters.get(key) === 1) {
+        r.set('lose', true)
         continue
       }
 
@@ -112,7 +112,7 @@ function openCascade(record, x, y) {
         const xx = dir[1] + cell[1]
         const yy = dir[0] + cell[0]
         const next = [yy, xx]
-        if (!visited.has(makeKey(...next)) && yy > -1 && yy < r.height && xx > -1 && xx < r.width) {
+        if (!visited.has(makeKey(next[1], next[0])) && yy > -1 && yy < r.height && xx > -1 && xx < r.width) {
           stack.push(next)
         }
       }
@@ -330,11 +330,16 @@ function BoardCell({ record, cell, chorded, x, y }) {
   const key = makeKey(x, y)
   const monster = record.monsters.get(key);
   const opened = record.opened.getIn([y, x]);
+
   let inner = <div className="inner"></div>
-  if (opened === 1)
-    inner = monster > 0
-      ? <div className="inner">X</div>
-      : <div className="inner">{cell || ''}</div>
+  if (record.lose && monster > 0)
+    inner = <div className="inner">X</div>
+  else if (opened === 1)
+    inner = (
+      monster > 0
+        ? <div className="inner">X</div>
+        : <div className="inner">{cell || ''}</div>
+    )
   else if (opened === 2)
     inner = <div className="inner">F</div>
 
