@@ -40,7 +40,8 @@ const GameRecord = Record({
   opened: null,
   monsters: null,
   chord: null,
-  lose: null
+  lose: null,
+  monstersLeft: 0,
 })
 
 function createLayer(width, height) {
@@ -68,6 +69,7 @@ export function createGame(width, height, mines) {
         continue;
       }
       r.setIn(['monsters', key], 1)
+      r.update('monstersLeft', v => v + 1)
 
       incrementArea(r, x, y, 1)
     }
@@ -176,7 +178,10 @@ export function Game({ initData }) {
       const y = +data.y
 
       return setState({
-        record: record.updateIn(['opened', y, x], v => v == 2 ? 0 : v == 0 ? 2 : v)
+        record: record.withMutations(r => {
+          r.update('monstersLeft', v => v - 1)
+          r.updateIn(['opened', y, x], v => v == 2 ? 0 : v == 0 ? 2 : v)
+        })
       })
     }
   }
@@ -268,20 +273,23 @@ export function Game({ initData }) {
   return (
     <div id="game-container" onMouseMove={throttle(pawFollow, 50)}>
       <div id="paw-cursor" ref={paw} />
-      <table id="game" className="skin-default"
-        onClick={handleClick}
-        onContextMenu={handleRightClick}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-      >
-        <tbody>
-          {record.counts.map((row, i) =>
-            <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
-          )}
-        </tbody>
-      </table>
+      <div>
+        <div>{record.monstersLeft}</div>
+        <table id="game" className="skin-default"
+          onClick={handleClick}
+          onContextMenu={handleRightClick}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+        >
+          <tbody>
+            {record.counts.map((row, i) =>
+              <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
