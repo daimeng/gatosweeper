@@ -42,15 +42,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 4px;
+  padding: 2px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 18px;
-  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 #monsters-left {
-  width: 48px;
-  padding: 4px;
+  width: 52px;
+  padding: 2px 0;
   text-align: center;
   box-sizing: border-box;
   color: pink;
@@ -65,8 +65,8 @@ body {
 }
 
 #timer {
-  width: 48px;
-  padding: 4px;
+  width: 52px;
+  padding: 2px 0;
   text-align: center;
   box-sizing: border-box;
   color: pink;

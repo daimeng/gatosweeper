@@ -9,9 +9,9 @@ if (module.hot) {
 
 
 function App() {
-  const width = 9
-  const height = 9
-  const mines = 10
+  const width = 16
+  const height = 16
+  const mines = 40
 
   return (
     <Game initData={{ record: createGame(width, height, mines) }}></Game>
