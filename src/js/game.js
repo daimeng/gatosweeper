@@ -102,6 +102,11 @@ function openCascade(record, x, y) {
       // if hit a mine, continue, but set loss flag
       if (r.monsters.get(key) === 1) {
         r.set('lose', true)
+        r.monsters.forEach((_, mkey) => {
+          const j = mkey & 0b11111111
+          const i = mkey >> 8
+          r.setIn(['opened', j, i], 1)
+        })
         continue
       }
 
@@ -128,6 +133,9 @@ export function Game({ initData }) {
   const paw = React.useRef(null)
 
   function handleClick(evt) {
+    evt.preventDefault()
+    if (record.lose) return false
+
     if (evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
       const x = +data.x
@@ -171,6 +179,7 @@ export function Game({ initData }) {
 
   function handleRightClick(evt) {
     evt.preventDefault()
+    if (record.lose) return false
 
     if (evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -232,6 +241,7 @@ export function Game({ initData }) {
 
   function handleMouseMove(evt) {
     evt.preventDefault()
+    if (record.lose) return false
 
     if (record.chord != null && evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -247,6 +257,7 @@ export function Game({ initData }) {
 
   function handleMouseDown(evt) {
     evt.preventDefault()
+    if (record.lose) return false
 
     if (evt.button === 1 && evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -275,6 +286,7 @@ export function Game({ initData }) {
 
   // start timer
   React.useEffect(() => {
+    if (record.lose) return
     const timer = setInterval(() => {
       const now = performance.now()
       setTime({
@@ -284,7 +296,7 @@ export function Game({ initData }) {
     }, 500)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [record.lose])
 
   return (
     <div id="game-container" onMouseMove={throttle(pawFollow, 50)}>
@@ -336,7 +348,7 @@ function BoardCell({ record, cell, chorded, x, y }) {
   let inner = <div className="inner"></div>
   if (opened === 1 && monster < 1)
     inner = <div className="inner">{cell || ''}</div>
-  else if (record.lose && monster > 0)
+  else if (opened === 1 && monster > 0)
     showMonster = true
   else if (opened === 2)
     showFlag = true
