@@ -229,9 +229,11 @@ export function Game({ initData }) {
   function handleMouseLeave(evt) {
     evt.preventDefault()
 
-    return setState({
-      record: record.set('chord', null)
-    })
+    if (!evt.target.classList.contains('board-cell')) {
+      return setState({
+        record: record.set('chord', null)
+      })
+    }
   }
 
 
