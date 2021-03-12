@@ -205,8 +205,9 @@ body {
 }
 
 .board-cell.monster {
-  border-color: rgb(185, 17, 17)!important;
+  border-color: #444!important;
   background: url('/static/monster.png');
+  background-color: #444!important;
   
   .inner {
     border: none !important;

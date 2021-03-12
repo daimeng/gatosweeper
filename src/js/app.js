@@ -1,5 +1,4 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import { render } from 'inferno'
 import { Game, createGame } from './game'
 
 if (module.hot) {
@@ -19,4 +18,4 @@ function App() {
 }
 
 
-ReactDOM.render(<App></App>, document.getElementById('app'))
+render(<App></App>, document.getElementById('app'))

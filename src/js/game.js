@@ -1,4 +1,4 @@
-import React from 'react'
+import { Component, createRef } from 'inferno'
 import { Map, Record, Range } from 'immutable'
 import throttle from 'lodash.throttle'
 
@@ -127,7 +127,7 @@ function openCascade(record, x, y) {
 
 const CHORDED = new Set()
 
-export class Game extends React.Component {
+export class Game extends Component {
   constructor({ initData }) {
     super()
     this.state = {
@@ -135,7 +135,7 @@ export class Game extends React.Component {
       gatoFrame: 0,
       time: 0,
     }
-    this.paw = React.createRef()
+    this.paw = createRef()
     this.handleClick = this.handleClick.bind(this)
     this.handleRightClick = this.handleRightClick.bind(this)
     this.handleMouseDown = this.handleMouseDown.bind(this)
@@ -200,7 +200,6 @@ export class Game extends React.Component {
       const data = evt.target.dataset
       const x = +data.x
       const y = +data.y
-
       return this.setState({
         record: record.withMutations(r => {
           const status = r.opened.getIn([y, x])
@@ -285,7 +284,7 @@ export class Game extends React.Component {
       const y = +data.y
 
       if (record.opened.getIn([y, x]) === 1)
-        return setState({
+        return this.setState({
           record: record.set('chord', [y, x])
         })
     }
@@ -325,6 +324,20 @@ export class Game extends React.Component {
       mood = 'sad'
     // else if (record.loss)
 
+    const rows = new Array(record.counts.size)
+    record.counts.forEach((row, i) => {
+      rows[i] = (
+        <BoardRow
+          key={i}
+          row={row}
+          y={i}
+          monsters={record.monsters}
+          opened={record.opened.get(i)}
+          chorded={CHORDED}
+        />
+      )
+    })
+
     return (
       <div id="game-container" onMouseMove={throttle(this.pawFollow, 50)}>
         <div id="paw-cursor" ref={this.paw} />
@@ -342,10 +355,8 @@ export class Game extends React.Component {
             onMouseUp={this.handleMouseUp}
             onMouseLeave={this.handleMouseLeave}
           >
-            <tbody>
-              {record.counts.map((row, i) =>
-                <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
-              )}
+            <tbody $HasKeyedChildren>
+              {rows}
             </tbody>
           </table>
         </div>
@@ -355,21 +366,32 @@ export class Game extends React.Component {
 }
 
 
-function BoardRow({ row, record, chorded, y }) {
+function BoardRow({ row, opened, monsters, chorded, y }) {
+  const cells = new Array(row.size)
+  let key
+  row.forEach((cell, j) => {
+    key = makeKey(j, y)
+    cells[j] = (
+      <BoardCell
+        key={j}
+        x={j}
+        y={y}
+        cell={cell}
+        opened={opened.get(j)}
+        monster={monsters.get(key) || 0}
+        chorded={chorded.has(key)}
+      />
+    )
+  })
+
   return (
-    <tr>
-      {row.map((cell, j) =>
-        <BoardCell key={j} x={j} y={y} cell={cell} record={record} chorded={chorded}></BoardCell>
-      )}
+    <tr $HasKeyedChildren>
+      {cells}
     </tr>
   )
 }
 
-
-function BoardCell({ record, cell, chorded, x, y }) {
-  const key = makeKey(x, y)
-  const monster = record.monsters.get(key) || 0;
-  const opened = record.opened.getIn([y, x]);
+function BoardCell({ opened, monster, cell, chorded, x, y }) {
   let showFlag = false
   let showMonster = false
 
@@ -382,8 +404,17 @@ function BoardCell({ record, cell, chorded, x, y }) {
     showFlag = true
 
   return (
-    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${showMonster ? 'monster' : ''} ${showFlag ? 'flagged' : ''} ${chorded.has(key) ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
+    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${showMonster ? 'monster' : ''} ${showFlag ? 'flagged' : ''} ${chorded ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
       {inner}
     </td>
   )
+}
+
+BoardCell.defaultHooks = {
+  onComponentShouldUpdate(p, n) {
+    return p.opened !== n.opened
+      || p.monster !== n.monster
+      || p.cell !== n.cell
+      || p.chorded !== n.chorded
+  }
 }
