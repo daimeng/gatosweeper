@@ -47,8 +47,8 @@ class Game {
     this.history = new Uint8Array(this.width * this.height)
     this.monsterCount = 40
     this.monstersLeft = this.monsterCount
-    this.time = 0;
-    this.lose = false;
+    this.time = 0
+    this.lose = false
     this.initData()
   }
 
@@ -81,8 +81,20 @@ class Game {
     }
   }
 
-  openCascade() {
+  handleRightClick(evt) {
+    evt.preventDefault()
 
+    if (evt.target.classList.contains('board-cell')) {
+      const key = evt.target.dataset.i
+      const el = select(evt.target)
+
+      const flagged = this.board[key] & FLAGGED
+      this.monstersLeft += flagged ? 1 : -1
+      this.monstersQ.text(this.monstersLeft)
+      this.board[key] ^= FLAGGED
+      el.classed('flagged', !flagged)
+    }
+    return false
   }
 
   render() {
@@ -116,9 +128,10 @@ class Game {
     const game = gameInner
       .append('div')
       .attr('id', 'game')
-      .style('width', 16 * (24 + 6) + 'px')
+      .style('width', 16 * (24 + 2) + 'px')
+      .on('contextmenu', evt => this.handleRightClick(evt))
 
-    const cells = game.selectAll('.board-cell')
+    this.cells = game.selectAll('.board-cell')
       .data(this.board)
       .enter()
       .append('div')
@@ -132,8 +145,9 @@ class Game {
       .classed('flagged', d => {
         return d & FLAGGED
       })
+      .attr('data-i', (d, i) => i)
 
-    const cellsInner = cells
+    const cellsInner = this.cells
       .append('div')
       .classed('inner', true)
       .text(d => {
@@ -144,11 +158,11 @@ class Game {
       })
 
     /* Bind Events */
-    gameContainer.on('mousemove', throttle(function (evt) {
-      evt.preventDefault()
+    // gameContainer.on('mousemove', throttle(function (evt) {
+    //   evt.preventDefault()
 
-      pawCursor.style('transform', `translate(${evt.clientX}px, ${evt.clientY}px)`)
-    }, 100))
+    //   pawCursor.style('transform', `translate(${evt.clientX}px, ${evt.clientY}px)`)
+    // }, 100))
 
     this.lastTimed = performance.now()
     this.timer = setInterval(() => {
