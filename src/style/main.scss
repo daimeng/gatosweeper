@@ -19,8 +19,7 @@ body {
 
 #game {
   font-size: 14px;
-  display: flex;
-  flex-wrap: wrap;
+  border-collapse: collapse;
 }
 
 #paw-cursor {
@@ -80,15 +79,14 @@ body {
   border: 2px solid white;
 }
 
-
 .board-cell {
   border: 2px solid #333;
   color: #333;
   border-radius: 3px;
+  margin: -1px;
   width: 24px;
   height: 24px;
   padding: 0px;
-  margin: -1px;
   overflow: hidden;
   box-sizing: content-box;
   text-align: center;
@@ -99,7 +97,7 @@ body {
   align-items: center;
   justify-content: center;
   border-left: 2px dotted #777;
-  border-right: 2px dashed #777;
+  border-right: 2px dashed #888;
   border-top: 2px solid #f1f6f0;
   border-bottom: 2px solid #d5d6db;
   box-sizing: border-box;

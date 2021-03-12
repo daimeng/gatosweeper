@@ -43,7 +43,9 @@ class Game {
     // 5: monsters
     // 6: opened
     // 7: flagged
-    this.board = new Uint8Array(this.width * this.height)
+    this.board = new Array(this.height).fill(null).map(
+      () => new Uint8Array(this.width)
+    )
     this.history = new Uint8Array(this.width * this.height)
     this.monsterCount = 40
     this.monstersLeft = this.monsterCount
@@ -62,7 +64,7 @@ class Game {
       const y1 = y + dy
       const x1 = x + dx
       if (this.valid(y1, x1)) {
-        this.board[y1 * this.width + x1] += dv
+        this.board[y1][x1] += dv
       }
     }
   }
@@ -71,27 +73,67 @@ class Game {
     for (let i = 0; i < this.monsterCount; i++) {
       let x = randrng(0, this.width)
       let y = randrng(0, this.height)
-      const key = y * this.width + x
-      if (this.board[key] & MONSTER) {
+      if (this.board[y][x] & MONSTER) {
         i--
         continue
       }
-      this.board[key] |= MONSTER
+      this.board[y][x] |= MONSTER
       this.incrementArea(y, x, 1)
     }
+  }
+
+  handleClick(evt) {
+    // if (evt.target.classList.contains('board-cell')) {
+    //   const data = evt.target.dataset
+    //   const x = +data.x
+    //   const y = +data.y
+
+    //   const d = this.board[y][x]
+    //   if (!(d & OPENED)) return
+
+    //   // if first action of game, move all mines in vicinity to the corners
+    //   if (this.first) {
+    //     for (let dir of DIRS) {
+    //       const xx = dir[1] + x
+    //       const yy = dir[0] + y
+    //       const oldKey = makeKey(xx, yy)
+    //       if (!r.monsters.has(oldKey))
+    //         continue
+
+    //       let nx, ny, newKey;
+    //       do {
+    //         nx = randrng(0, r.width)
+    //         ny = randrng(0, r.height)
+    //         newKey = makeKey(nx, ny)
+    //       } while (Math.abs(nx - x) == 1 || Math.abs(ny - y) == 1 || r.monsters.get(newKey))
+
+    //       r.deleteIn(['monsters', oldKey])
+    //       incrementArea(r, xx, yy, -1)
+    //       r.setIn(['monsters', newKey], 1)
+    //       incrementArea(r, nx, ny, 1)
+    //     }
+    //     r.set('first', false);
+    //   }
+
+    //   // if (r.monsters.getIn([y, x]))
+    //   // open the square
+    //   openCascade(r, x, y)
+    // }
   }
 
   handleRightClick(evt) {
     evt.preventDefault()
 
     if (evt.target.classList.contains('board-cell')) {
-      const key = evt.target.dataset.i
+      const data = evt.target.dataset
+      const y = +data.y
+      const x = +data.x
       const el = select(evt.target)
 
-      const flagged = this.board[key] & FLAGGED
+      const flagged = this.board[y][x] & FLAGGED
       this.monstersLeft += flagged ? 1 : -1
       this.monstersQ.text(this.monstersLeft)
-      this.board[key] ^= FLAGGED
+      this.board[y][x] ^= FLAGGED
       el.classed('flagged', !flagged)
     }
     return false
@@ -126,15 +168,21 @@ class Game {
 
     /* Game Board */
     const game = gameInner
-      .append('div')
+      .append('table')
       .attr('id', 'game')
-      .style('width', 16 * (24 + 2) + 'px')
       .on('contextmenu', evt => this.handleRightClick(evt))
+      .on('click', evt => this.handleClick(evt))
+      .append('tbody')
 
-    this.cells = game.selectAll('.board-cell')
+    this.cells = game.selectAll('.board-row')
       .data(this.board)
       .enter()
-      .append('div')
+      .append('tr')
+      .classed('board-row', true)
+      .selectAll('.board-cell')
+      .data(d => d)
+      .enter()
+      .append('td')
       .classed('board-cell', true)
       .classed('opened', d => {
         return d & OPENED

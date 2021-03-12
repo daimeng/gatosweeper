@@ -1,5 +1,3 @@
-
-
 export function makeKey(y, x) {
   return (y << 5) | x
 }
