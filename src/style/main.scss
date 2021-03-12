@@ -180,7 +180,7 @@ body {
 }
 
 .board-cell.monster {
-  // color: darkred;
+  border-color: rgb(185, 17, 17)!important;
   background: url('/static/monster.png');
   
   .inner {
