@@ -72,6 +72,30 @@ body {
   background: url('/static/gato.png');
 }
 
+.gato-idle-0 {
+  background-position: 0 0;
+}
+
+.gato-idle-1 {
+  background-position: 24px 0;
+}
+
+.gato-happy-0 {
+  background-position: 48px 0;
+}
+
+.gato-happy-1 {
+  background-position: 0 24px;
+}
+
+.gato-sad-0 {
+  background-position: 24px 24px;
+}
+
+.gato-sad-1 {
+  background-position: 24px 48px;
+}
+
 #timer {
   width: 52px;
   padding: 2px 0;
@@ -89,7 +113,7 @@ body {
   width: 24px;
   height: 24px;
   padding: 0px;
-  margin: 1px;
+  margin: 0.5px;
   overflow: hidden;
   box-sizing: content-box;
   text-align: center;
@@ -185,7 +209,7 @@ body {
   background: url('/static/monster.png');
   
   .inner {
-    border: none;
+    border: none !important;
     overflow: visible;
   }
 }

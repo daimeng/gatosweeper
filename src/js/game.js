@@ -127,13 +127,27 @@ function openCascade(record, x, y) {
 
 const CHORDED = new Set()
 
-export function Game({ initData }) {
-  const [state, setState] = React.useState(initData)
-  const record = state.record
-  const paw = React.useRef(null)
+export class Game extends React.Component {
+  constructor({ initData }) {
+    super()
+    this.state = {
+      record: initData,
+      gatoFrame: 0,
+      time: 0,
+    }
+    this.paw = React.createRef()
+    this.handleClick = this.handleClick.bind(this)
+    this.handleRightClick = this.handleRightClick.bind(this)
+    this.handleMouseDown = this.handleMouseDown.bind(this)
+    this.handleMouseMove = this.handleMouseMove.bind(this)
+    this.handleMouseUp = this.handleMouseUp.bind(this)
+    this.handleMouseLeave = this.handleMouseLeave.bind(this)
+    this.pawFollow = this.pawFollow.bind(this)
+  }
 
-  function handleClick(evt) {
+  handleClick(evt) {
     evt.preventDefault()
+    const { record } = this.state
     if (record.lose) return false
 
     if (evt.target.classList.contains('board-cell')) {
@@ -142,9 +156,9 @@ export function Game({ initData }) {
       const y = +data.y
       if (record.opened.getIn([y, x]) !== 0) return
 
-      return setState({
+      return this.setState({
         record:
-          state.record.withMutations(r => {
+          record.withMutations(r => {
             // if first action of game, move all mines in vicinity to the corners
             if (r.first) {
               for (let dir of DIRS_SELF) {
@@ -177,8 +191,9 @@ export function Game({ initData }) {
     }
   }
 
-  function handleRightClick(evt) {
+  handleRightClick(evt) {
     evt.preventDefault()
+    const { record } = this.state
     if (record.lose) return false
 
     if (evt.target.classList.contains('board-cell')) {
@@ -186,7 +201,7 @@ export function Game({ initData }) {
       const x = +data.x
       const y = +data.y
 
-      return setState({
+      return this.setState({
         record: record.withMutations(r => {
           const status = r.opened.getIn([y, x])
           r.update('monstersLeft', v => v + (status == 2 ? 1 : status == 0 ? -1 : 0))
@@ -196,11 +211,12 @@ export function Game({ initData }) {
     }
   }
 
-  function handleMouseUp(evt) {
+  handleMouseUp(evt) {
     evt.preventDefault()
+    const { record } = this.state
 
     if (evt.button === 1) {
-      return setState({
+      return this.setState({
         record: record.withMutations(r => {
           if (r.chord != null) {
             let mcount = 0
@@ -226,23 +242,24 @@ export function Game({ initData }) {
     }
   }
 
-  function handleMouseLeave(evt) {
+  handleMouseLeave(evt) {
     evt.preventDefault()
+    const { record } = this.state
 
     if (!evt.target.classList.contains('board-cell')) {
-      return setState({
+      return this.setState({
         record: record.set('chord', null)
       })
     }
   }
 
-
-  function pawFollow(evt) {
-    paw.current.style.transform = `translate(${evt.clientX}px, ${evt.clientY}px)`
+  pawFollow(evt) {
+    this.paw.current.style.transform = `translate(${evt.clientX}px, ${evt.clientY}px)`
   }
 
-  function handleMouseMove(evt) {
+  handleMouseMove(evt) {
     evt.preventDefault()
+    const { record } = this.state
     if (record.lose) return false
 
     if (record.chord != null && evt.target.classList.contains('board-cell')) {
@@ -251,14 +268,15 @@ export function Game({ initData }) {
       const y = +data.y
 
       if (record.opened.getIn([y, x]) === 1)
-        return setState({
+        return this.setState({
           record: record.set('chord', [y, x])
         })
     }
   }
 
-  function handleMouseDown(evt) {
+  handleMouseDown(evt) {
     evt.preventDefault()
+    const { record } = this.state
     if (record.lose) return false
 
     if (evt.button === 1 && evt.target.classList.contains('board-cell')) {
@@ -273,59 +291,67 @@ export function Game({ initData }) {
     }
   }
 
-  // create a lookup for chords
-  CHORDED.clear()
-  if (record.chord) {
-    for (let dir of DIRS) {
-      const x = dir[1] + record.chord[1]
-      const y = dir[0] + record.chord[0]
-      if (valid(record, y, x))
-        CHORDED.add(makeKey(x, y))
+  render() {
+    const { time, gatoFrame, record } = this.state
+
+    // create a lookup for chords
+    CHORDED.clear()
+    if (record.chord) {
+      for (let dir of DIRS) {
+        const x = dir[1] + record.chord[1]
+        const y = dir[0] + record.chord[0]
+        if (valid(record, y, x))
+          CHORDED.add(makeKey(x, y))
+      }
     }
-  }
 
-  const [time, setTime] = React.useState({ time: 0, lastTimed: performance.now() })
+    // start timer
+    // React.useEffect(() => {
+    //   const timer = setInterval(() => {
+    //     if (!record.lose) {
+    //       const now = performance.now()
+    //       setTime({
+    //         time: time.time + now - time.lastTimed,
+    //         lastTimed: now
+    //       })
+    //     }
+    //   }, 500 )
 
-  // start timer
-  React.useEffect(() => {
-    if (record.lose) return
-    const timer = setInterval(() => {
-      const now = performance.now()
-      setTime({
-        time: time.time + now - time.lastTimed,
-        lastTimed: now
-      })
-    }, 500)
+    //   return () => clearInterval(timer)
+    // }, [record.lose])
 
-    return () => clearInterval(timer)
-  }, [record.lose])
+    let mood = 'idle'
+    if (record.lose)
+      mood = 'sad'
+    // else if (record.loss)
 
-  return (
-    <div id="game-container" onMouseMove={throttle(pawFollow, 50)}>
-      <div id="paw-cursor" ref={paw} />
-      <div>
-        <div id="hud">
-          <div id="monsters-left">{record.monstersLeft}</div>
-          <div id="gato"></div>
-          <div id="timer">{`${Math.min(999, Math.floor(time.time / 1000))}`.padStart(3, '0')}</div>
+    return (
+      <div id="game-container" onMouseMove={throttle(this.pawFollow, 50)}>
+        <div id="paw-cursor" ref={this.paw} />
+        <div>
+          <div id="hud">
+            <div id="monsters-left">{record.monstersLeft}</div>
+            <div id="gato" className={`gato-${mood}-${gatoFrame}`} />
+            <div id="timer">{`${Math.min(999, Math.floor(time / 1000))}`.padStart(3, '0')}</div>
+          </div>
+          <table id="game" className="skin-default"
+            onClick={this.handleClick}
+            onContextMenu={this.handleRightClick}
+            onMouseDown={this.handleMouseDown}
+            onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleMouseUp}
+            onMouseLeave={this.handleMouseLeave}
+          >
+            <tbody>
+              {record.counts.map((row, i) =>
+                <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
+              )}
+            </tbody>
+          </table>
         </div>
-        <table id="game" className="skin-default"
-          onClick={handleClick}
-          onContextMenu={handleRightClick}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        >
-          <tbody>
-            {record.counts.map((row, i) =>
-              <BoardRow key={i} row={row} y={i} record={record} chorded={CHORDED}></BoardRow>
-            )}
-          </tbody>
-        </table>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 
