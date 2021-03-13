@@ -418,7 +418,7 @@ export class Game extends Component {
     })
 
     return (
-      <div>
+      <div id="game-wrapper">
         <div id="hud">
           <div id="monsters-left">{record.monstersLeft}</div>
           <Gato ref={this.gato} mood={mood} onClick={this.newGame} />
