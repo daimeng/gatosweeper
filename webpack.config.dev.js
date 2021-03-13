@@ -22,21 +22,5 @@ module.exports = merge(common, {
       chunkModules: false
     }
   },
-  module: {
-    rules: [
-      {
-        test: /\.ya?ml$/,
-        type: 'json',
-        oneOf: [
-          {
-            resourceQuery: /stream/,
-            options: { asStream: true },
-            loader: 'yaml-loader'
-          },
-          { use: 'yaml-loader' }
-        ]
-      },
-    ],
-  },
   plugins: [new webpack.HotModuleReplacementPlugin()],
 });
