@@ -14,7 +14,7 @@ const generateHTMLPlugins = () => glob.sync('./src/**/*.html').map(
 module.exports = {
   entry: ['./src/js/app.js', './src/style/main.scss'],
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'docs'),
     filename: 'app.bundle.js',
   },
   module: {

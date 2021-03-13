@@ -61,4 +61,4 @@ typings/
 .DS_Store
 
 # Only page branch will store this
-dist/
+docs/
