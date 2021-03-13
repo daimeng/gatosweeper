@@ -1,5 +1,5 @@
 import { Component, createRef } from 'inferno'
-import { Map, Record, Range } from 'immutable'
+import { Map as ImMap, Record, Range } from 'immutable'
 import throttle from 'lodash.throttle'
 import { Timer } from './timer'
 import { Gato } from './gato'
@@ -46,6 +46,7 @@ const GameRecord = Record({
   monsters: null,
   cond: PLAY,
   monstersLeft: 0,
+  // hints: null
 })
 
 function createLayer(width, height) {
@@ -59,7 +60,8 @@ export function createGame(width, height, mines) {
     height,
     counts: createLayer(width, height),
     opened: createLayer(width, height),
-    monsters: new Map(),
+    monsters: new ImMap(),
+    // hints: new ImMap()
   })
 
   return record.withMutations(r => {
@@ -89,6 +91,39 @@ function incrementArea(record, x, y, dv) {
         r.updateIn(['counts', y1, x1], v => v + dv)
       }
     }
+  })
+}
+
+
+const MINE = 1
+const WRONG = 2
+function checkInvalid(record) {
+  record.opened.forEach((r, i) => {
+    r.forEach((v, j) => {
+      if (v === 1) {
+        let count = record.counts.getIn([i, j])
+        // let unopened = count
+        let open
+        for (let [y, x] of DIRS) {
+          y += i
+          x += j
+          // remove 1 from count for each flag
+          open = r.get(x)
+          count -= open === 2
+          // unopened -= open !== 0
+        }
+        // flagged doesn't match count
+        if (count < 0) {
+          for (let [y, x] of DIRS) {
+            y += i
+            x += j
+            // remove 1 from count for each flag
+            if (r.get(x) === 2)
+              record.setIn(['hints', i, j], WRONG)
+          }
+        }
+      }
+    })
   })
 }
 
@@ -223,6 +258,7 @@ export class Game extends Component {
 
             // open the square
             openCascade(r, x, y)
+            // checkInvalid(r)
           }),
         chord: this.state.chord
       })
@@ -243,6 +279,7 @@ export class Game extends Component {
           const status = r.opened.getIn([y, x])
           r.update('monstersLeft', v => v + (status == 2 ? 1 : status == 0 ? -1 : 0))
           r.setIn(['opened', y, x], status == 2 ? 0 : status == 0 ? 2 : status)
+          // checkInvalid(r)
         })
       })
     }
@@ -271,6 +308,7 @@ export class Game extends Component {
                 if (r.opened.getIn([y, x]) === 0 && valid(r, y, x))
                   openCascade(r, x, y)
               }
+              // checkInvalid(r)
             }
           }
         }),
@@ -441,7 +479,7 @@ function BoardCell({ opened, monster, cell, chorded, x, y }) {
     showFlag = true
 
   return (
-    <td className={`board-cell ${opened === 1 ? 'opened' : ''} ${showMonster ? 'monster' : ''} ${showFlag ? 'flagged' : ''} ${chorded ? 'chorded' : ''} cell-${cell}`} data-x={x} data-y={y}>
+    <td className={`cell-${cell} board-cell${opened === 1 ? ' opened' : ''}${showMonster ? ' monster' : ''}${showFlag ? ' flagged' : ''}${chorded ? ' chorded' : ''}`} data-x={x} data-y={y}>
       {inner}
     </td>
   )
