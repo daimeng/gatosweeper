@@ -1,6 +1,8 @@
 import { Component, createRef } from 'inferno'
 import { Map, Record, Range } from 'immutable'
 import throttle from 'lodash.throttle'
+import { Timer } from './timer'
+import { Gato } from './gato'
 
 function makeKey(x, y) {
   return (x << 8) | y
@@ -130,12 +132,11 @@ const CHORDED = new Set()
 export class Game extends Component {
   constructor({ initData }) {
     super()
-    this.state = {
-      record: initData,
-      gatoFrame: 0,
-      time: 0,
-    }
+    this.state = { record: initData }
     this.paw = createRef()
+    this.timer = createRef()
+    this.gato = createRef()
+    // binds
     this.handleClick = this.handleClick.bind(this)
     this.handleRightClick = this.handleRightClick.bind(this)
     this.handleMouseDown = this.handleMouseDown.bind(this)
@@ -181,9 +182,10 @@ export class Game extends Component {
                 incrementArea(r, nx, ny, 1)
               }
               r.set('first', false);
+
+              this.timer.current.start()
             }
 
-            // if (r.monsters.getIn([y, x]))
             // open the square
             openCascade(r, x, y)
           })
@@ -212,6 +214,7 @@ export class Game extends Component {
 
   handleMouseUp(evt) {
     evt.preventDefault()
+    this.gato.current.unshock()
     const { record } = this.state
 
     if (evt.button === 1) {
@@ -275,6 +278,8 @@ export class Game extends Component {
 
   handleMouseDown(evt) {
     evt.preventDefault()
+    if (evt.button !== 2)
+      this.gato.current.shock()
     const { record } = this.state
     if (record.lose) return false
 
@@ -291,7 +296,7 @@ export class Game extends Component {
   }
 
   render() {
-    const { time, gatoFrame, record } = this.state
+    const { gatoFrame, record } = this.state
 
     // create a lookup for chords
     CHORDED.clear()
@@ -304,24 +309,11 @@ export class Game extends Component {
       }
     }
 
-    // start timer
-    // React.useEffect(() => {
-    //   const timer = setInterval(() => {
-    //     if (!record.lose) {
-    //       const now = performance.now()
-    //       setTime({
-    //         time: time.time + now - time.lastTimed,
-    //         lastTimed: now
-    //       })
-    //     }
-    //   }, 500 )
-
-    //   return () => clearInterval(timer)
-    // }, [record.lose])
-
     let mood = 'idle'
-    if (record.lose)
+    if (record.lose) {
+      this.timer.current.stop()
       mood = 'sad'
+    }
     // else if (record.loss)
 
     const rows = new Array(record.counts.size)
@@ -344,8 +336,8 @@ export class Game extends Component {
         <div>
           <div id="hud">
             <div id="monsters-left">{record.monstersLeft}</div>
-            <div id="gato" className={`gato-${mood}-${gatoFrame}`} />
-            <div id="timer">{`${Math.min(999, Math.floor(time / 1000))}`.padStart(3, '0')}</div>
+            <Gato ref={this.gato} mood={mood} />
+            <Timer ref={this.timer} />
           </div>
           <table id="game" className="skin-default"
             onClick={this.handleClick}
