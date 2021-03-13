@@ -53,7 +53,10 @@ export class Gato extends Component {
   }
 
   stop() {
-    if (this.timer) clearInterval(this.timer)
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
   }
 
   render() {

@@ -144,8 +144,8 @@ export class Game extends Component {
   constructor({ initData }) {
     super()
     this.state = { record: initData, chord: null }
-    this.history = []
-    this.historyPointer = 0
+    this.history = [initData]
+    this.historyPointer = 1
     this.paw = createRef()
     this.timer = createRef()
     this.gato = createRef()
@@ -165,7 +165,7 @@ export class Game extends Component {
       this.history.length = this.historyPointer
 
       // only save record data
-      this.history.push(this.state.record)
+      this.history.push(newState.record)
 
       // increment history base pointer
       this.historyPointer++
@@ -175,10 +175,9 @@ export class Game extends Component {
 
   goHistory(location) {
     this.historyPointer = location
-    console.log(this.history[this.historyPointer])
     return super.setState({
       ...this.state,
-      record: this.history[this.historyPointer]
+      record: this.history[this.historyPointer++]
     })
   }
 
@@ -392,9 +391,9 @@ export class Game extends Component {
               {rows}
             </tbody>
           </table>
-          <div className="history-bar">
+          <div className="history-bar" $HasKeyedChildren>
             {this.history.map((r, i) =>
-              <div className="history-entry" onClick={() => this.goHistory(i)} />
+              <div key={i} className={`history-entry ${this.historyPointer === i + 1 ? 'current-entry' : ''}`} onClick={() => this.goHistory(i)} />
             )}
           </div>
         </div>
