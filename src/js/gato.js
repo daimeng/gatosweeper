@@ -19,11 +19,13 @@ export class Gato extends Component {
   }
 
   shock() {
-    this.setState({ frame: 1 })
+    if (this.props.mood === 'idle')
+      this.setState({ frame: 1 })
   }
 
   unshock() {
-    this.setState({ frame: 0 })
+    if (this.props.mood === 'idle')
+      this.setState({ frame: 0 })
   }
 
   go(mood) {

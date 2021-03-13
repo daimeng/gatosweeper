@@ -8,9 +8,9 @@ if (module.hot) {
 
 
 function App() {
-  const width = 30
-  const height = 16
-  const mines = 99
+  const width = 9
+  const height = 9
+  const mines = 10
 
   return (
     <Game initData={createGame(width, height, mines)}></Game>

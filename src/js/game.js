@@ -33,6 +33,9 @@ const DIRS_SELF = [
   [0, 0],
 ]
 
+const PLAY = 0
+const LOSE = 1
+const WIN = 2
 
 const GameRecord = Record({
   width: 0,
@@ -42,7 +45,7 @@ const GameRecord = Record({
   opened: null,
   monsters: null,
   chord: null,
-  lose: false,
+  cond: PLAY,
   monstersLeft: 0,
 })
 
@@ -103,7 +106,7 @@ function openCascade(record, x, y) {
 
       // if hit a mine, continue, but set loss flag
       if (r.monsters.get(key) === 1) {
-        r.set('lose', true)
+        r.set('cond', LOSE)
         r.monsters.forEach((_, mkey) => {
           const j = mkey & 0b11111111
           const i = mkey >> 8
@@ -124,6 +127,15 @@ function openCascade(record, x, y) {
         }
       }
     }
+
+    // check win, if all are open
+    let openCount = 0
+    r.opened.forEach(rr => {
+      rr.forEach(open => openCount += open === 1)
+    })
+
+    if (openCount === r.width * r.height - r.monsters.size)
+      r.set('cond', WIN)
   })
 }
 
@@ -149,7 +161,7 @@ export class Game extends Component {
   handleClick(evt) {
     evt.preventDefault()
     const { record } = this.state
-    if (record.lose) return false
+    if (record.cond) return false
 
     if (evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -196,7 +208,7 @@ export class Game extends Component {
   handleRightClick(evt) {
     evt.preventDefault()
     const { record } = this.state
-    if (record.lose) return false
+    if (record.cond) return false
 
     if (evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -262,7 +274,7 @@ export class Game extends Component {
   handleMouseMove(evt) {
     evt.preventDefault()
     const { record } = this.state
-    if (record.lose) return false
+    if (record.cond) return false
 
     if (record.chord != null && evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -281,7 +293,7 @@ export class Game extends Component {
     if (evt.button !== 2)
       this.gato.current.shock()
     const { record } = this.state
-    if (record.lose) return false
+    if (record.cond) return false
 
     if (evt.button === 1 && evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
@@ -310,11 +322,13 @@ export class Game extends Component {
     }
 
     let mood = 'idle'
-    if (record.lose) {
+    if (record.cond === 1) {
       this.timer.current.stop()
       mood = 'sad'
+    } else if (record.cond === 2) {
+      this.timer.current.stop()
+      mood = 'happy'
     }
-    // else if (record.loss)
 
     const rows = new Array(record.counts.size)
     record.counts.forEach((row, i) => {
