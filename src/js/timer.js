@@ -27,7 +27,18 @@ export class Timer extends Component {
   }
 
   stop() {
-    if (this.timer) clearInterval(this.timer)
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
+  }
+
+  reset() {
+    this.stop()
+    this.setState({
+      time: 0,
+      lastTimed: null
+    })
   }
 
   render() {

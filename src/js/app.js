@@ -1,4 +1,5 @@
-import { render } from 'inferno'
+import { render, Component, createRef } from 'inferno'
+import throttle from 'lodash.throttle'
 import { Game, createGame } from './game'
 
 if (module.hot) {
@@ -7,14 +8,35 @@ if (module.hot) {
 }
 
 
-function App() {
-  const width = 9
-  const height = 9
-  const mines = 10
+class App extends Component {
+  constructor(props) {
+    super(props)
 
-  return (
-    <Game initData={createGame(width, height, mines)}></Game>
-  )
+    this.width = 9
+    this.height = 9
+    this.mines = 10
+    this.paw = createRef()
+
+    this.pawFollow = this.pawFollow.bind(this)
+    this.createGame = this.createGame.bind(this)
+  }
+
+  createGame() {
+    return createGame(this.width, this.height, this.mines)
+  }
+
+  pawFollow(evt) {
+    this.paw.current.style.transform = `translate(${evt.clientX}px, ${evt.clientY}px)`
+  }
+
+  render() {
+    return (
+      <div id="game-container" onMouseMove={throttle(this.pawFollow, 50)}>
+        <div id="paw-cursor" ref={this.paw} />
+        <Game initData={this.createGame}></Game>
+      </div>
+    )
+  }
 }
 
 

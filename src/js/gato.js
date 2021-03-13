@@ -61,7 +61,7 @@ export class Gato extends Component {
 
   render() {
     return (
-      <div id="gato" className={`gato-${this.props.mood}-${this.state.frame}`} />
+      <div id="gato" onClick={this.props.onClick} className={`gato-${this.props.mood}-${this.state.frame}`} />
     )
   }
 }

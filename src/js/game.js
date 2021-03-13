@@ -169,7 +169,8 @@ function openCascade(record, x, y) {
     })
 
     if (openCount === r.width * r.height - r.monsters.size)
-      r.set('cond', WIN)
+      if (r.cond !== LOSE)
+        r.set('cond', WIN)
   })
 }
 
@@ -178,10 +179,11 @@ const CHORDED = new Set()
 export class Game extends Component {
   constructor({ initData }) {
     super()
-    this.state = { record: initData, chord: null }
-    this.history = [initData]
+    this.initData = initData
+    this.state = { record: initData(), chord: null }
+    this.history = [this.state.record]
     this.historyPointer = 1
-    this.paw = createRef()
+
     this.timer = createRef()
     this.gato = createRef()
     // binds
@@ -191,7 +193,7 @@ export class Game extends Component {
     this.handleMouseMove = this.handleMouseMove.bind(this)
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.handleMouseLeave = this.handleMouseLeave.bind(this)
-    this.pawFollow = this.pawFollow.bind(this)
+    this.newGame = this.newGame.bind(this)
   }
 
   setState(newState, cb) {
@@ -213,6 +215,17 @@ export class Game extends Component {
     return super.setState({
       ...this.state,
       record: this.history[this.historyPointer++]
+    })
+  }
+
+  newGame() {
+    const newData = this.initData()
+    this.history = [newData]
+    this.historyPointer = 1
+    this.timer.current.reset()
+    super.setState({
+      record: newData,
+      chord: null
     })
   }
 
@@ -329,10 +342,6 @@ export class Game extends Component {
     }
   }
 
-  pawFollow(evt) {
-    this.paw.current.style.transform = `translate(${evt.clientX}px, ${evt.clientY}px)`
-  }
-
   handleMouseMove(evt) {
     evt.preventDefault()
     const { record, chord } = this.state
@@ -409,31 +418,28 @@ export class Game extends Component {
     })
 
     return (
-      <div id="game-container" onMouseMove={throttle(this.pawFollow, 50)}>
-        <div id="paw-cursor" ref={this.paw} />
-        <div>
-          <div id="hud">
-            <div id="monsters-left">{record.monstersLeft}</div>
-            <Gato ref={this.gato} mood={mood} />
-            <Timer ref={this.timer} />
-          </div>
-          <table id="game" className="skin-default"
-            onClick={this.handleClick}
-            onContextMenu={this.handleRightClick}
-            onMouseDown={this.handleMouseDown}
-            onMouseMove={this.handleMouseMove}
-            onMouseUp={this.handleMouseUp}
-            onMouseLeave={this.handleMouseLeave}
-          >
-            <tbody $HasKeyedChildren>
-              {rows}
-            </tbody>
-          </table>
-          <div className="history-bar" $HasKeyedChildren>
-            {this.history.map((r, i) =>
-              <div key={i} className={`history-entry ${this.historyPointer === i + 1 ? 'current-entry' : ''}`} onClick={() => this.goHistory(i)} />
-            )}
-          </div>
+      <div>
+        <div id="hud">
+          <div id="monsters-left">{record.monstersLeft}</div>
+          <Gato ref={this.gato} mood={mood} onClick={this.newGame} />
+          <Timer ref={this.timer} />
+        </div>
+        <table id="game" className="skin-default"
+          onClick={this.handleClick}
+          onContextMenu={this.handleRightClick}
+          onMouseDown={this.handleMouseDown}
+          onMouseMove={this.handleMouseMove}
+          onMouseUp={this.handleMouseUp}
+          onMouseLeave={this.handleMouseLeave}
+        >
+          <tbody $HasKeyedChildren>
+            {rows}
+          </tbody>
+        </table>
+        <div className="history-bar" $HasKeyedChildren>
+          {this.history.map((r, i) =>
+            <div key={i} className={`history-entry ${this.historyPointer === i + 1 ? 'current-entry' : ''}`} onClick={() => this.goHistory(i)} />
+          )}
         </div>
       </div>
     )
