@@ -43,12 +43,19 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: './src/static/',
-        to: './static/',
-      },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './src/static/',
+          globOptions: {
+            dot: true,
+            gitignore: true,
+            ignore: ["**/*.xcf"],
+          },
+          to: './static/',
+        },
+      ]
+    }),
     ...generateHTMLPlugins(),
   ],
   stats: {
