@@ -44,7 +44,6 @@ const GameRecord = Record({
   counts: null,
   opened: null,
   monsters: null,
-  chord: null,
   cond: PLAY,
   monstersLeft: 0,
 })
@@ -144,7 +143,9 @@ const CHORDED = new Set()
 export class Game extends Component {
   constructor({ initData }) {
     super()
-    this.state = { record: initData }
+    this.state = { record: initData, chord: null }
+    this.history = []
+    this.historyPointer = 0
     this.paw = createRef()
     this.timer = createRef()
     this.gato = createRef()
@@ -156,6 +157,17 @@ export class Game extends Component {
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.handleMouseLeave = this.handleMouseLeave.bind(this)
     this.pawFollow = this.pawFollow.bind(this)
+  }
+
+  setState(newState, cb) {
+    this.history.length = length
+    this.history.push(this.state)
+    this.historyPointer++
+    return super.setState(newState, cb)
+  }
+
+  goHistory(dir = -1) {
+    super.setState(this.history[this.historyPointer + dir], cb)
   }
 
   handleClick(evt) {
@@ -200,7 +212,8 @@ export class Game extends Component {
 
             // open the square
             openCascade(r, x, y)
-          })
+          }),
+        chord: this.state.chord
       })
     }
   }
@@ -227,31 +240,30 @@ export class Game extends Component {
   handleMouseUp(evt) {
     evt.preventDefault()
     this.gato.current.unshock()
-    const { record } = this.state
+    const { record, chord } = this.state
 
     if (evt.button === 1) {
       return this.setState({
         record: record.withMutations(r => {
-          if (r.chord != null) {
+          if (chord != null) {
             let mcount = 0
             for (let dir of DIRS) {
-              const x = dir[1] + record.chord[1]
-              const y = dir[0] + record.chord[0]
+              const x = dir[1] + chord[1]
+              const y = dir[0] + chord[0]
               if (r.opened.getIn([y, x]) === 2 && valid(r, y, x))
                 mcount++
             }
-            if (mcount === r.counts.getIn(r.chord)) {
+            if (mcount === r.counts.getIn(chord)) {
               for (let dir of DIRS) {
-                const x = dir[1] + record.chord[1]
-                const y = dir[0] + record.chord[0]
+                const x = dir[1] + chord[1]
+                const y = dir[0] + chord[0]
                 if (r.opened.getIn([y, x]) === 0 && valid(r, y, x))
                   openCascade(r, x, y)
               }
             }
           }
-
-          r.set('chord', null)
-        })
+        }),
+        chord: null
       })
     }
   }
@@ -262,7 +274,8 @@ export class Game extends Component {
 
     if (!evt.target.classList.contains('board-cell')) {
       return this.setState({
-        record: record.set('chord', null)
+        record,
+        chord: null
       })
     }
   }
@@ -273,17 +286,18 @@ export class Game extends Component {
 
   handleMouseMove(evt) {
     evt.preventDefault()
-    const { record } = this.state
+    const { record, chord } = this.state
     if (record.cond) return false
 
-    if (record.chord != null && evt.target.classList.contains('board-cell')) {
+    if (chord != null && evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
       const x = +data.x
       const y = +data.y
 
       if (record.opened.getIn([y, x]) === 1)
         return this.setState({
-          record: record.set('chord', [y, x])
+          record,
+          chord: [y, x]
         })
     }
   }
@@ -302,20 +316,21 @@ export class Game extends Component {
 
       if (record.opened.getIn([y, x]) === 1)
         return this.setState({
-          record: record.set('chord', [y, x])
+          record,
+          chord: [y, x]
         })
     }
   }
 
   render() {
-    const { gatoFrame, record } = this.state
+    const { record, chord } = this.state
 
     // create a lookup for chords
     CHORDED.clear()
-    if (record.chord) {
+    if (chord) {
       for (let dir of DIRS) {
-        const x = dir[1] + record.chord[1]
-        const y = dir[0] + record.chord[0]
+        const x = dir[1] + chord[1]
+        const y = dir[0] + chord[0]
         if (valid(record, y, x))
           CHORDED.add(makeKey(x, y))
       }
