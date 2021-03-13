@@ -19,11 +19,11 @@
   "author": "kobold taskmaster",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.12.1",
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
     "babel-loader": "^8.0.2",
     "babel-plugin-inferno": "^6.1.1",
-    "babel-preset-env": "^1.7.0",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "^1.0.0",
@@ -50,7 +50,6 @@
     "last 2 versions"
   ],
   "dependencies": {
-    "@babel/preset-env": "^7.12.1",
     "d3": "^6.6.0",
     "immutable": "^4.0.0-rc.12",
     "inferno": "^7.4.8",
