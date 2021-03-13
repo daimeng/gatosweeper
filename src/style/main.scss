@@ -16,7 +16,7 @@
 body {
   margin: 0;
   height: 100vh;
-  cursor: url('/static/cursor2_top.png') 8 0, pointer;
+  cursor: url('../static/cursor2_top.png') 8 0, pointer;
   /* image-rendering: crisp-edges; */
   image-rendering: pixelated;
   overflow: hidden;
@@ -37,7 +37,7 @@ body {
 
 #paw-cursor {
   position: absolute;
-  background-image: url('/static/cursor2_hi.png');
+  background-image: url('../static/cursor2_hi.png');
   width: 40px;
   height: 52px;
   top: 14px;
@@ -96,7 +96,7 @@ body {
   box-sizing: content-box;
   border: 2px solid transparent;
   border-radius: 5px;
-  background-image: url('/static/gato.png');
+  background-image: url('../static/gato.png');
 
   &:hover {
     background-color: #e1e1e1;
@@ -283,12 +283,12 @@ body {
 }
 
 .board-cell.flagged {
-  background-image: url('/static/paw.png');
+  background-image: url('../static/paw.png');
 }
 
 .board-cell.monster {
   border-color: #444!important;
-  background: url('/static/monster.png');
+  background: url('../static/monster.png');
   background-color: #444!important;
   
   .inner {
