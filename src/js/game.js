@@ -1,6 +1,5 @@
 import { Component, createRef } from 'inferno'
 import { Map as ImMap, Record, Range } from 'immutable'
-import throttle from 'lodash.throttle'
 import { Timer } from './timer'
 import { Gato } from './gato'
 
@@ -187,6 +186,7 @@ export class Game extends Component {
     this.timer = createRef()
     this.gato = createRef()
     // binds
+    this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.handleRightClick = this.handleRightClick.bind(this)
     this.handleMouseDown = this.handleMouseDown.bind(this)
@@ -231,51 +231,56 @@ export class Game extends Component {
 
   handleClick(evt) {
     evt.preventDefault()
-    const { record } = this.state
-    if (record.cond) return false
-
     if (evt.target.classList.contains('board-cell')) {
       const data = evt.target.dataset
       const x = +data.x
       const y = +data.y
-      if (record.opened.getIn([y, x]) !== 0) return
 
-      return this.setState({
-        record:
-          record.withMutations(r => {
-            // if first action of game, move all mines in vicinity to the corners
-            if (r.first) {
-              for (let dir of DIRS_SELF) {
-                const xx = dir[1] + x
-                const yy = dir[0] + y
-                const oldKey = makeKey(xx, yy)
-                if (!r.monsters.has(oldKey))
-                  continue
-
-                let nx, ny, newKey;
-                do {
-                  nx = randrng(0, r.width)
-                  ny = randrng(0, r.height)
-                  newKey = makeKey(nx, ny)
-                } while (Math.abs(nx - x) == 1 || Math.abs(ny - y) == 1 || r.monsters.get(newKey))
-
-                r.deleteIn(['monsters', oldKey])
-                incrementArea(r, xx, yy, -1)
-                r.setIn(['monsters', newKey], 1)
-                incrementArea(r, nx, ny, 1)
-              }
-              r.set('first', false);
-
-              this.timer.current.start()
-            }
-
-            // open the square
-            openCascade(r, x, y)
-            // checkInvalid(r)
-          }),
-        chord: this.state.chord
-      })
+      this._open(x, y)
     }
+  }
+
+  _open(x, y) {
+    const { record } = this.state
+    if (record.cond) return false
+
+    if (record.opened.getIn([y, x]) !== 0) return
+
+    return this.setState({
+      record:
+        record.withMutations(r => {
+          // if first action of game, move all mines in vicinity to the corners
+          if (r.first) {
+            for (let dir of DIRS_SELF) {
+              const xx = dir[1] + x
+              const yy = dir[0] + y
+              const oldKey = makeKey(xx, yy)
+              if (!r.monsters.has(oldKey))
+                continue
+
+              let nx, ny, newKey;
+              do {
+                nx = randrng(0, r.width)
+                ny = randrng(0, r.height)
+                newKey = makeKey(nx, ny)
+              } while (Math.abs(nx - x) == 1 || Math.abs(ny - y) == 1 || r.monsters.get(newKey))
+
+              r.deleteIn(['monsters', oldKey])
+              incrementArea(r, xx, yy, -1)
+              r.setIn(['monsters', newKey], 1)
+              incrementArea(r, nx, ny, 1)
+            }
+            r.set('first', false);
+
+            this.timer.current.start()
+          }
+
+          // open the square
+          openCascade(r, x, y)
+          // checkInvalid(r)
+        }),
+      chord: this.state.chord
+    })
   }
 
   handleRightClick(evt) {
@@ -380,6 +385,28 @@ export class Game extends Component {
     }
   }
 
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown, false);
+  }
+
+  handleKeyDown(evt) {
+    if (evt.key === 'F2') {
+      this.newGame()
+    }
+    // if (evt.key === 'c') {
+
+    // }
+    // if (evt.key === 'x') {
+
+    // }
+    // if (evt.key === 'z') {
+    // }
+  }
+
   render() {
     const { record, chord } = this.state
 
@@ -425,6 +452,7 @@ export class Game extends Component {
           <Timer ref={this.timer} />
         </div>
         <table id="game" className="skin-default"
+          onKeyPess={this.handleKeyPress}
           onClick={this.handleClick}
           onContextMenu={this.handleRightClick}
           onMouseDown={this.handleMouseDown}
