@@ -20,11 +20,26 @@ class App extends Component {
   }
 
   createGame() {
-    const w = document.getElementById('width')
-    const h = document.getElementById('height')
-    const m = document.getElementById('monsters')
+    let w = document.getElementById('width')
+    let h = document.getElementById('height')
+    let m = document.getElementById('monsters')
 
-    return createGame(w ? +w.value : 9, h ? +h.value : 9, m ? +m.value : 10)
+    if (w && h && m) {
+      w = +w.value
+      h = +h.value
+      m = +m.value
+
+      if (m > w * h) {
+        console.log('Invalid dimension and monster count.')
+        return false;
+      }
+    } else {
+      w = 9
+      h = 9
+      m = 10
+    }
+
+    return createGame(w, h, m)
   }
 
   pawFollow(evt) {
@@ -61,7 +76,7 @@ class App extends Component {
             <select onChange={this.setDifficulty}>
               <option value="0">Beginner (9x9:10)</option>
               <option value="1">Intermediate (16x16:40)</option>
-              <option value="2">Expert (30x16:40)</option>
+              <option value="2">Expert (30x16:99)</option>
             </select>
             <label for="width">
               {'W: '}
@@ -79,7 +94,7 @@ class App extends Component {
               onClick={() => this.game.current.newGame()}
             >
               New Game
-          </button>
+            </button>
             <a id="controls" href="javascript:void(0)" onClick={() => document.getElementById('modal').style.display = 'flex'}>Controls</a>
           </div>
           <Game ref={this.game} initData={this.createGame}></Game>

@@ -219,14 +219,16 @@ export class Game extends Component {
   }
 
   newGame() {
-    const newData = this.initData()
-    this.history = [newData]
-    this.historyPointer = 1
-    this.timer.current.reset()
-    super.setState({
-      record: newData,
-      chord: null
-    })
+    if (this.initData) {
+      const newData = this.initData()
+      this.history = [newData]
+      this.historyPointer = 1
+      this.timer.current.reset()
+      super.setState({
+        record: newData,
+        chord: null
+      })
+    }
   }
 
   handleClick(evt) {
