@@ -160,14 +160,26 @@ export class Game extends Component {
   }
 
   setState(newState, cb) {
-    this.history.length = length
-    this.history.push(this.state)
-    this.historyPointer++
+    if (newState.record !== this.state.record) {
+      // invalidate history newer than current base
+      this.history.length = this.historyPointer
+
+      // only save record data
+      this.history.push(this.state.record)
+
+      // increment history base pointer
+      this.historyPointer++
+    }
     return super.setState(newState, cb)
   }
 
-  goHistory(dir = -1) {
-    super.setState(this.history[this.historyPointer + dir], cb)
+  goHistory(location) {
+    this.historyPointer = location
+    console.log(this.history[this.historyPointer])
+    return super.setState({
+      ...this.state,
+      record: this.history[this.historyPointer]
+    })
   }
 
   handleClick(evt) {
@@ -380,6 +392,11 @@ export class Game extends Component {
               {rows}
             </tbody>
           </table>
+          <div className="history-bar">
+            {this.history.map((r, i) =>
+              <div className="history-entry" onClick={() => this.goHistory(i)} />
+            )}
+          </div>
         </div>
       </div>
     )
