@@ -1,3 +1,7 @@
+html {
+  font-size: 10px;
+}
+
 ::selection {
   background-color: transparent;
 }
@@ -18,7 +22,7 @@ body {
 }
 
 #game {
-  font-size: 14px;
+  font-size: 1.4rem;
   border-collapse: collapse;
   // display: flex;
   // flex-wrap: wrap;
@@ -27,10 +31,10 @@ body {
 #paw-cursor {
   position: absolute;
   background-image: url('../static/cursor2_hi.png');
-  width: 40px;
-  height: 52px;
-  top: 14px;
-  left: 0px;
+  width: 4rem;
+  height: 5.2rem;
+  top: 1.4rem;
+  left: 0;
   transition: transform 0.2s ease-out;
   pointer-events: none;
 }
@@ -45,17 +49,20 @@ body {
 }
 
 #width, #height, #monsters {
-  max-width: 40px;
+  max-width: 4rem;
 }
 
 #navbar {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  padding: 0 1.2rem;
+  font-size: 1.5rem;
 }
 
 #game-wrapper {
   margin: auto;
+  margin-top: -2rem;
   width: max-content;
 }
 
@@ -63,36 +70,36 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 2px;
+  padding: 0.2rem;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 18px;
-  letter-spacing: 1px;
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
 }
 
 #monsters-left {
-  width: 52px;
-  padding: 2px 0;
+  width: 5.2rem;
+  padding: 0.2rem 0;
   text-align: center;
   box-sizing: border-box;
   color: pink;
   background-color: #444;
-  border: 2px solid white;
+  border: 0.2rem solid white;
 }
 
 #gato {
-  width: 48px;
-  height: 48px;
+  width: 4.8rem;
+  height: 4.8rem;
   box-sizing: content-box;
-  border: 2px solid transparent;
-  border-radius: 5px;
+  border: 0.2rem solid transparent;
+  border-radius: 0.5rem;
   background-image: url('../static/gato.png');
 
   &:hover {
     background-color: #e1e1e1;
-    border-top: 2px solid #cecece;
-    border-bottom: 2px solid #c0c0c0;
-    border-left: 2px solid #b0b0b0;
-    border-right: 2px solid #a0a0a0;
+    border-top: 0.2rem solid #cecece;
+    border-bottom: 0.2rem solid #c0c0c0;
+    border-left: 0.2rem solid #b0b0b0;
+    border-right: 0.2rem solid #a0a0a0;
   }
 
   &:active {
@@ -101,7 +108,8 @@ body {
 }
 
 #modal {
-  border: 1px solid #444;
+  font-size: 2rem;
+  border: 0.1rem solid #444;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -110,7 +118,7 @@ body {
   justify-content: center;
   top: 0;
   left: 0;
-  background-color: rgba(9, 9, 9, 0.4);
+  background-color: rgba(9, 9, 9, 0.8);
 }
 
 #modal-content {
@@ -124,45 +132,45 @@ body {
 }
 
 .gato-idle-1 {
-  background-position: -48px 0;
+  background-position: -4.8rem 0;
 }
 
 .gato-happy-0 {
-  background-position: -96px 0;
+  background-position: -9.6rem 0;
 }
 
 .gato-happy-1 {
-  background-position: 0 -48px;
+  background-position: 0 -4.8rem;
 }
 
 .gato-sad-0 {
-  background-position: -48px -48px;
+  background-position: -4.8rem -4.8rem;
 }
 
 .gato-sad-1 {
-  background-position: -96px -48px;
+  background-position: -9.6rem -4.8rem;
 }
 
 #timer {
-  width: 52px;
-  padding: 2px 0;
+  width: 5.2rem;
+  padding: 0.2rem 0;
   text-align: center;
   box-sizing: border-box;
   color: pink;
   background-color: #444;
-  border: 2px solid white;
+  border: 0.2rem solid white;
 }
 
 .history-bar {
   width: 100%;
-  height: 20px;
-  margin-top: 4px;
+  height: 2rem;
+  margin-top: 0.4rem;
   box-sizing: border-box;
   display: flex;
 }
 
 .history-entry {
-  height: 16px;
+  height: 1.4rem;
   box-sizing: border-box;
   display: inline-flex;
   width: 100%;
@@ -174,17 +182,17 @@ body {
 }
 
 .history-entry.current-entry {
-  border: 2px solid orchid;
+  border: 0.2rem solid orchid;
 }
 
 .board-cell {
-  border: 2px solid #333;
+  border: 0.2rem solid #333;
   color: #333;
-  border-radius: 3px;
-  width: 24px;
-  height: 24px;
-  padding: 0px;
-  margin: 0.5px;
+  border-radius: 0.3rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  margin: 0.05rem;
   overflow: hidden;
   box-sizing: content-box;
   text-align: center;
@@ -197,10 +205,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 2px dotted #777;
-  border-right: 2px dashed #888;
-  border-top: 2px solid #f1f6f0;
-  border-bottom: 2px solid #d5d6db;
+  border-left: 0.2rem dotted #777;
+  border-right: 0.2rem dashed #888;
+  border-top: 0.2rem solid #f1f6f0;
+  border-bottom: 0.2rem solid #d5d6db;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -241,15 +249,15 @@ body {
 
 .board-cell:hover {
   .inner {
-    border: 2px solid yellow;
-    border-radius: 4px;
+    border: 0.2rem solid yellow;
+    border-radius: 0.4rem;
   }
 }
 
 .board-cell.opened:hover {
   // background-color: #bbb;
   .inner {
-    border: 2px solid yellow;
+    border: 0.2rem solid yellow;
   }
 }
 

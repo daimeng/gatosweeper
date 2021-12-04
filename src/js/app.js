@@ -74,9 +74,9 @@ class App extends Component {
         <div id="game-container" onMouseMove={throttle(this.pawFollow, 50)}>
           <div id="navbar">
             <select onChange={this.setDifficulty}>
-              <option value="0">Beginner (9x9:10)</option>
-              <option value="1">Intermediate (16x16:40)</option>
-              <option value="2">Expert (30x16:99)</option>
+              <option value="0">9x9:10</option>
+              <option value="1">16x16:40</option>
+              <option value="2">30x16:99</option>
             </select>
             <label for="width" style={{ display: "none" }}>
               {'W: '}
@@ -90,11 +90,6 @@ class App extends Component {
               {'M: '}
               <input type="number" id="monsters" name="monsters" min="1" max="" defaultValue="10" />
             </label>
-            <button id="new-game" href="javascript:void(0)"
-              onClick={() => this.game.current.newGame()}
-            >
-              New Game
-            </button>
             <a id="controls" href="javascript:void(0)" onClick={() => document.getElementById('modal').style.display = 'flex'}>Controls</a>
           </div>
           <Game ref={this.game} initData={this.createGame}></Game>
@@ -104,7 +99,7 @@ class App extends Component {
           <div id="modal-content">
             <ul>
               <li><b>Left-click</b> an unopened tile to reveal it. Be careful of monsters.</li>
-              <li><b>Right-click</b> an unopened tile to mark it and warn yourself of monsters.</li>
+              <li><b>Right-click</b> an unopened tile to mark it and warn yourself about monsters.</li>
               <li><b>Middle-click</b> a numbered tile to reveal its adjacent tile.</li>
               <li>Press <b>F2</b> or click Gato to start a new game.</li>
             </ul>
