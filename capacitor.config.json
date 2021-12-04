@@ -1,0 +1,6 @@
+{
+  "appId": "io.github.daimeng.dawnsweeper",
+  "appName": "dawnsweeper",
+  "webDir": "src",
+  "bundledWebRuntime": false
+}

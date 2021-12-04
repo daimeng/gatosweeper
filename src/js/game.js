@@ -2,6 +2,7 @@ import { Component, createRef } from 'inferno'
 import { Map as ImMap, Record, Range } from 'immutable'
 import { Timer } from './timer'
 import { Gato } from './gato'
+import { throttle } from 'lodash'
 
 function makeKey(x, y) {
   return (x << 8) | y
@@ -179,7 +180,12 @@ export class Game extends Component {
   constructor({ initData }) {
     super()
     this.initData = initData
-    this.state = { record: initData(), chord: null }
+    this.state = {
+      record: initData(),
+      chord: null,
+      screenWidth: document.documentElement.clientWidth,
+      screenHeight: document.documentElement.clientHeight
+    }
     this.history = [this.state.record]
     this.historyPointer = 1
 
@@ -194,6 +200,7 @@ export class Game extends Component {
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.handleMouseLeave = this.handleMouseLeave.bind(this)
     this.newGame = this.newGame.bind(this)
+    this.handleResize = throttle(this.handleResize.bind(this), 100)
   }
 
   setState(newState, cb) {
@@ -388,11 +395,20 @@ export class Game extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown, false);
+    document.addEventListener('keydown', this.handleKeyDown, false)
+    window.addEventListener('resize', this.handleResize, false)
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyDown, false);
+    window.addEventListener('resize', this.handleResize, false)
+    document.removeEventListener('keydown', this.handleKeyDown, false)
+  }
+
+  handleResize() {
+    this.setState({
+      screenWidth: document.documentElement.clientWidth,
+      screenHeight: document.documentElement.clientHeight
+    });
   }
 
   handleKeyDown(evt) {
@@ -410,7 +426,9 @@ export class Game extends Component {
   }
 
   render() {
-    const { record, chord } = this.state
+    const { record, chord, screenHeight, screenWidth } = this.state
+
+    const flipped = screenHeight > screenWidth * 1.2
 
     // create a lookup for chords
     CHORDED.clear()
@@ -432,19 +450,60 @@ export class Game extends Component {
       mood = 'happy'
     }
 
-    const rows = new Array(record.counts.size)
-    record.counts.forEach((row, i) => {
-      rows[i] = (
-        <BoardRow
-          key={i}
-          row={row}
-          y={i}
-          monsters={record.monsters}
-          opened={record.opened.get(i)}
-          chorded={CHORDED}
-        />
-      )
-    })
+    let rows
+    if (flipped) {
+      rows = new Array(record.width)
+      for (let i = 0; i < record.width; i++) {
+        const cells = new Array(record.height)
+        let key
+        for (let j = 0; j < record.height; j++) {
+          key = makeKey(i, j)
+          cells[j] = (
+            <BoardCell
+              key={j}
+              x={i}
+              y={j}
+              cell={record.counts.get(j).get(i)}
+              opened={record.opened.get(j).get(i)}
+              monster={record.monsters.get(key) || 0}
+              chorded={CHORDED.has(key)}
+            />
+          )
+        }
+
+        rows[i] = (
+          <tr key={i} $HasKeyedChildren>
+            {cells}
+          </tr>
+        )
+      }
+    } else {
+      rows = new Array(record.height)
+      for (let i = 0; i < record.height; i++) {
+        const cells = new Array(record.width)
+        let key
+        for (let j = 0; j < record.width; j++) {
+          key = makeKey(j, i)
+          cells[j] = (
+            <BoardCell
+              key={j}
+              x={j}
+              y={i}
+              cell={record.counts.get(i).get(j)}
+              opened={record.opened.get(i).get(j)}
+              monster={record.monsters.get(key) || 0}
+              chorded={CHORDED.has(key)}
+            />
+          )
+        }
+
+        rows[i] = (
+          <tr key={i} $HasKeyedChildren>
+            {cells}
+          </tr>
+        )
+      }
+    }
 
     return (
       <div id="game-wrapper">
@@ -466,53 +525,29 @@ export class Game extends Component {
             {rows}
           </tbody>
         </table>
-        <div className="history-bar" $HasKeyedChildren>
+        {/* <div className="history-bar" $HasKeyedChildren>
           {this.history.map((r, i) =>
             <div key={i} className={`history-entry ${this.historyPointer === i + 1 ? 'current-entry' : ''}`} onClick={() => this.goHistory(i)} />
           )}
-        </div>
+        </div> */}
       </div>
     )
   }
-}
-
-
-function BoardRow({ row, opened, monsters, chorded, y }) {
-  const cells = new Array(row.size)
-  let key
-  row.forEach((cell, j) => {
-    key = makeKey(j, y)
-    cells[j] = (
-      <BoardCell
-        key={j}
-        x={j}
-        y={y}
-        cell={cell}
-        opened={opened.get(j)}
-        monster={monsters.get(key) || 0}
-        chorded={chorded.has(key)}
-      />
-    )
-  })
-
-  return (
-    <tr $HasKeyedChildren>
-      {cells}
-    </tr>
-  )
 }
 
 function BoardCell({ opened, monster, cell, chorded, x, y }) {
   let showFlag = false
   let showMonster = false
 
-  let inner = <div className="inner"></div>
-  if (opened === 1 && monster < 1)
-    inner = <div className="inner">{cell || ''}</div>
-  else if (opened === 1 && monster > 0)
+  let inner = <div className="inner">&nbsp;</div>
+  if (opened === 1 && monster < 1) {
+    if (cell)
+      inner = <div className="inner">{cell}</div>
+  } else if (opened === 1 && monster > 0) {
     showMonster = true
-  else if (opened === 2)
+  } else if (opened === 2) {
     showFlag = true
+  }
 
   return (
     <td className={`cell-${cell} board-cell${opened === 1 ? ' opened' : ''}${showMonster ? ' monster' : ''}${showFlag ? ' flagged' : ''}${chorded ? ' chorded' : ''}`} data-x={x} data-y={y}>

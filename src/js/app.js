@@ -78,15 +78,15 @@ class App extends Component {
               <option value="1">Intermediate (16x16:40)</option>
               <option value="2">Expert (30x16:99)</option>
             </select>
-            <label for="width">
+            <label for="width" style={{ display: "none" }}>
               {'W: '}
               <input type="number" id="width" name="width" min="9" max="100" defaultValue="9" />
             </label>
-            <label for="height">
+            <label for="height" style={{ display: "none" }}>
               {'H: '}
               <input type="number" id="height" name="height" min="9" max="100" defaultValue="9" />
             </label>
-            <label for="monsters">
+            <label for="monsters" style={{ display: "none" }}>
               {'M: '}
               <input type="number" id="monsters" name="monsters" min="1" max="" defaultValue="10" />
             </label>

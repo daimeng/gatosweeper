@@ -5,6 +5,11 @@ const common = require('./webpack.config.common.js');
 module.exports = merge(common, {
   mode: 'development',
   target: 'web',
+  resolve: {
+    alias: {
+      'inferno': 'inferno/dist/index.dev.esm.js',
+    },
+  },
   devServer: {
     // contentBase: 'src',
     // watchContentBase: true,
