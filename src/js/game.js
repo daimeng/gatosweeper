@@ -396,12 +396,18 @@ export class Game extends Component {
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown, false)
-    window.addEventListener('resize', this.handleResize, false)
+    document.addEventListener('resize', this.handleResize, false)
+    document.addEventListener('gesturestart', this.handleGestureStart, false)
   }
 
   componentWillUnmount() {
-    window.addEventListener('resize', this.handleResize, false)
+    document.removeEventListener('gesturestart', this.handleGestureStart, false)
+    document.removeEventListener('resize', this.handleResize, false)
     document.removeEventListener('keydown', this.handleKeyDown, false)
+  }
+
+  handleGestureStart(e) {
+    console.log(e)
   }
 
   handleResize() {

@@ -7,7 +7,6 @@ if (module.hot) {
   module.hot.accept()
 }
 
-
 class App extends Component {
   constructor(props) {
     super(props)
